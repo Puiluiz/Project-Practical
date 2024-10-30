@@ -207,7 +207,7 @@
 							id="quantity"
 							type="text"
 							value="1"
-							class="bg-[#FFFFFF] w-[80px] text-center text-black font-semibold border border-gray-300 rounded-lg py-2 px-20"
+							class="bg-[#FFFFFF] w-[80px] text-center text-black font-semibold border border-gray-300 rounded-lg py-2 px-4"
 							on:input={updateprice}
 						/>
 					</div>
