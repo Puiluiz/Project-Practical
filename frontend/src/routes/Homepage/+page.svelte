@@ -1,9 +1,23 @@
 <script>
 	import { onMount } from 'svelte';
 
+    let isDropdownOpen = false; // state สำหรับ dropdown
 	let username = '';
 	let balance = 0;
 	let role = ''; // เก็บ role ของผู้ใช้
+
+
+    // ฟังก์ชันจัดการการเปิด/ปิด dropdown
+    function toggleDropdown() {
+        isDropdownOpen = !isDropdownOpen;
+    }
+
+    // ฟังก์ชันจัดการ logout
+    function handleLogout() {
+        // ลบข้อมูลใน localStorage และเปลี่ยนหน้าไปยังหน้า login
+        localStorage.clear();
+        window.location.href = '/login';
+    }
 
 	onMount(() => {
 		const usernameFromStorage = localStorage.getItem('username');
@@ -32,6 +46,32 @@
 		}
 	});
 </script>
+
+<style>
+    /* กำหนด CSS ให้ dropdown เป็นแนวตั้ง */
+    .dropdown-menu {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 160px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+    }
+
+    .dropdown-item {
+        padding: 10px;
+        font-family: 'MyCustomFont2';
+        font-size: 18px;
+        color: #4A4A4A;
+        text-align: left;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f0f0f0;
+    }
+</style>
 
 <div class="mx-auto w-full text-white text-center h-full">
 	<div class="relative isolate bg-gradient-to-t from-[#B5BAE4] to-[#FFFFFF] h-full">
@@ -83,14 +123,20 @@
                     </a>
                 </button>
 
-				<!-- Display Username -->
-				<button>
-                    <a href="/profile" class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="h-[30px] w-[30px] md:h-[40px] md:w-[40px] lg:h-[50px] lg:w-[50px]">
-                            <path fill="#ffe3de" fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0a4.5 4.5 0 0 1-9 0M3.751 20.105a8.25 8.25 0 0 1 16.498 0a.75.75 0 0 1-.437.695A18.7 18.7 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="font-mitr font-regular text-sm md:text-lg lg:text-xl text-[#2C2C2C] ml-2">{username}</span>
-                    </a>
+
+                <!-- Display Username และ Dropdown -->
+                <button on:click={toggleDropdown} class="relative flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="h-[30px] w-[30px] md:h-[40px] md:w-[40px] lg:h-[50px] lg:w-[50px]">
+                        <path fill="#ffe3de" fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0a4.5 4.5 0 0 1-9 0M3.751 20.105a8.25 8.25 0 0 1 16.498 0a.75.75 0 0 1-.437.695A18.7 18.7 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="font-mitr font-regular text-sm md:text-lg lg:text-xl text-[#2C2C2C] ml-2">{username}</span>
+
+                    {#if isDropdownOpen}
+                        <div class="dropdown-menu">
+                            <button on:click={handleLogout} class="dropdown-item">Logout</button>
+                            <button on:click={() => window.location.href = '/profile'} class="dropdown-item">จัดการรหัสผ่าน</button>
+                        </div>
+                    {/if}
                 </button>
 
 				<!-- Display Balance -->

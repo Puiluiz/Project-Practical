@@ -9,13 +9,14 @@
 	let userID = ''; // Initialize userID
 	let role = ''; // เก็บ role ของผู้ใช้
 
-	// Fetch username, balance, and userID from localStorage on mount
+	// ดึงค่า username, balance, userID, และ role จาก localStorage เมื่อหน้าโหลด
 	onMount(() => {
 		if (typeof window !== 'undefined') {
-			// Ensure we're in the browser
+			// เช็คว่าอยู่ใน browser
 			username = localStorage.getItem('username') || '';
 			balance = parseFloat(localStorage.getItem('balance') || '0');
-			userID = localStorage.getItem('userID') || ''; // Fetch userID from localStorage
+			userID = localStorage.getItem('userID') || '';
+			role = localStorage.getItem('role') || ''; // ดึงค่า role จาก localStorage
 		}
 	});
 
@@ -89,16 +90,16 @@
 
 			<div class="flex items-center space-x-4 md:space-x-6 lg:space-x-8">
 				<!-- ตรวจสอบ role ว่าเป็น ADMIN หรือไม่ ถ้าใช่แสดง ManageProducts และ ManageUser -->
-				{#if role === 'ADMIN'}
-					<button>
-						<a
-							href="/Homepage-Admin"
-							class="font-mitr font-regular bg-white text-[#2C2C2C] text-xs sm:text-sm md:text-lg lg:text-xl px-3 py-1 sm:px-4 sm:py-2 border border-gray-300 rounded-3xl hover:bg-gray-100 drop-shadow-md"
-							>AdminManage</a
-						>
-					</button>
-				{/if}
 
+				{#if role === 'ADMIN'}
+				<button>
+					<a
+						href="/Homepage-Admin"
+						class="font-mitr font-regular bg-white text-[#2C2C2C] text-xs sm:text-sm md:text-lg lg:text-xl px-3 py-1 sm:px-4 sm:py-2 border border-gray-300 rounded-3xl hover:bg-gray-100 drop-shadow-md"
+						>AdminManage</a
+					>
+				</button>
+			{/if}
 				<!-- Display Products, History, Top-up -->
 				<button class="flex items-center ml-10">
 					<a href="/product" class="flex items-center">
@@ -149,10 +150,6 @@
 				viewBox="0 0 24 24"
 				class="h-[300px] w-[300px]"
 			>
-				<path
-					fill="#ffe3de"
-					d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2"
-				/>
 			</svg>
 
 			<div class="flex flex-col w-1/2 space-y-4">
