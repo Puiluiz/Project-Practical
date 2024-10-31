@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	let username = '';
 	let balance = 0;
@@ -8,16 +8,51 @@
 	let newPassword = '';
 	let userID = ''; // Initialize userID
 	let role = ''; // เก็บ role ของผู้ใช้
+	let showProfileModal = false;
 
-	// Fetch username, balance, and userID from localStorage on mount
+    function toggleProfileModal() {
+        showProfileModal = !showProfileModal;
+    }
+
+		function closeProfileModal(event) {
+        // ตรวจสอบว่า target ของคลิกไม่ได้อยู่ใน navbar
+        if (!event.target.closest('#profile-navbar') && !event.target.closest('#profile-button')) {
+            showProfileModal = false;
+        }
+    }
+
 	onMount(() => {
-		if (typeof window !== 'undefined') {
-			// Ensure we're in the browser
-			username = localStorage.getItem('username') || '';
-			balance = parseFloat(localStorage.getItem('balance') || '0');
-			userID = localStorage.getItem('userID') || ''; // Fetch userID from localStorage
+		const usernameFromStorage = localStorage.getItem('username');
+		const userIDFromStorage = localStorage.getItem('userID');
+		const roleFromStorage = localStorage.getItem('role') || ''; // ดึง role จาก localStorage
+		document.addEventListener('click', closeProfileModal);
+
+		if (usernameFromStorage) {
+			username = usernameFromStorage;
+			role = roleFromStorage; // เก็บ role
+
+			// Fetch user data and balance after login
+			async function fetchUserData() {
+				try {
+					const response = await fetch(`http://localhost:3000/users/${userIDFromStorage}`);
+					const userData = await response.json();
+
+					if (userData && userData.balance !== undefined) {
+						balance = userData.balance;
+						localStorage.setItem('balance', balance.toString());
+					}
+				} catch (error) {
+					console.error('Error fetching user data:', error);
+				}
+			}
+			fetchUserData();
 		}
 	});
+
+	onDestroy(() => {
+        // ลบ event listener เมื่อ destroy component
+        document.removeEventListener('click', closeProfileModal);
+    });
 
 	// Function to handle form submission
 	async function updateUserInfo() {
@@ -119,15 +154,28 @@
                     </a>
                 </button>
 
-				<!-- Display Username -->
-				<button>
-                    <a href="/profile" class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="h-[30px] w-[30px] md:h-[40px] md:w-[40px] lg:h-[50px] lg:w-[50px]">
-                            <path fill="#ffe3de" fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0a4.5 4.5 0 0 1-9 0M3.751 20.105a8.25 8.25 0 0 1 16.498 0a.75.75 0 0 1-.437.695A18.7 18.7 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="font-mitr font-regular text-sm md:text-lg lg:text-xl text-[#2C2C2C] ml-2">{username}</span>
-                    </a>
-                </button>
+								<!-- ปุ่มเพื่อเปิด/ปิด navbar -->
+								<button id="profile-button" on:click={toggleProfileModal} class="flex items-center">
+									<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="h-[30px] w-[30px] md:h-[40px] md:w-[40px] lg:h-[50px] lg:w-[50px]">
+											<path fill="#ffe3de" fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0a4.5 4.5 0 0 1-9 0M3.751 20.105a8.25 8.25 0 0 1 16.498 0a.75.75 0 0 1-.437.695A18.7 18.7 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695" clip-rule="evenodd"/>
+									</svg>
+									<span class="font-mitr font-regular text-sm md:text-lg lg:text-xl text-[#2C2C2C] ml-2">{username}</span>
+								</button>
+
+								<!-- เมนู navbar ด้านขวา -->
+								{#if showProfileModal}
+									<div id="profile-navbar" class="fixed top-0 right-0 h-full w-64 bg-white bg-opacity-75 flex flex-col items-center p-6">
+											<div class="text-[#2C2C2C] font-mitr font-regular w-full">
+													<h3 class="text-lg font-regular mb-4 bg-[#FFE3DE] rounded-lg p-4 drop-shadow-2xl">Profile Options</h3>
+													<button class="w-full mb-2">
+															<a href="/profile" class="font-mitr font-regular bg-[#6CAAF0] text-white px-4 py-1 rounded w-full text-center block">Edit profile</a>
+													</button>
+													<button class="w-full">
+															<a href="/" class="font-mitr font-regular bg-[#6CAAF0] text-white px-4 py-1 rounded w-full text-center block">Log out</a>
+													</button>
+											</div>
+									</div>
+								{/if}
 
 				<!-- Display Balance -->
 				<button class="flex items-center">
@@ -156,40 +204,40 @@
 			</svg>
 
 			<div class="flex flex-col w-1/2 space-y-4">
-				<label for="email" class="block text-[#2C2C2C] font-semibold text-left text-2xl mb-1"
+				<label for="email" class="block font-mitr font-regular text-[#2C2C2C] text-left text-2xl mb-1"
 					>Email (optional)</label
 				>
 				<input
 					bind:value={email}
 					type="email"
 					placeholder="Email"
-					class="w-full p-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#B5BAE4] text-[#2C2C2C]"
+					class="font-mitr font-regular w-full p-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#B5BAE4] text-[#2C2C2C]"
 				/>
 
-				<label for="oldPassword" class="block text-[#2C2C2C] font-semibold text-left text-2xl mb-1"
+				<label for="oldPassword" class="block font-mitr font-regular text-[#2C2C2C] text-left text-2xl mb-1"
 					>Old Password (required for password change)</label
 				>
 				<input
 					bind:value={oldPassword}
 					type="password"
 					placeholder="Old Password"
-					class="w-full p-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#B5BAE4] text-[#2C2C2C]"
+					class="font-mitr font-regular w-full p-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#B5BAE4] text-[#2C2C2C]"
 				/>
 
-				<label for="newPassword" class="block text-[#2C2C2C] font-semibold text-left text-2xl mb-1"
+				<label for="newPassword" class="block font-mitr font-regular text-[#2C2C2C] text-left text-2xl mb-1"
 					>New Password (required for password change)</label
 				>
 				<input
 					bind:value={newPassword}
 					type="password"
 					placeholder="New Password"
-					class="w-full p-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#B5BAE4] text-[#2C2C2C]"
+					class="font-mitr font-regular w-full p-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#B5BAE4] text-[#2C2C2C]"
 				/>
 
 				<div class="flex justify-end items-center mt-10">
 					<button
 						on:click={updateUserInfo}
-						class="bg-white text-[#2C2C2C] px-4 py-2 border border-gray-300 rounded-3xl hover:bg-gray-100 drop-shadow-md"
+						class="font-mitr font-regular bg-white text-[#2C2C2C] px-4 py-2 border border-gray-300 rounded-3xl hover:bg-gray-100 drop-shadow-md"
 					>
 						Update Info
 					</button>
