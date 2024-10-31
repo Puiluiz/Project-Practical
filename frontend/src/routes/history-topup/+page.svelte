@@ -1,68 +1,100 @@
 <script>
-	import { onDestroy, onMount } from 'svelte';
+	    import { onMount } from 'svelte';
 
-	let username = '';
-	let balance = 0;
-	let role = '';
-	let topupHistory = []; // Stores top-up history data
-	let showProfileModal = false;
+let username = '';
+let balance = 0;
+let role = '';
+let topupHistory = [];
+// Pagination settings
+let currentPageTopup = 1;
+const itemsPerPageTopup = 10;
 
-    function toggleProfileModal() {
-        showProfileModal = !showProfileModal;
-    }
+let isDropdownOpen = false;
 
-		function closeProfileModal(event) {
-        // ตรวจสอบว่า target ของคลิกไม่ได้อยู่ใน navbar
-        if (!event.target.closest('#profile-navbar') && !event.target.closest('#profile-button')) {
-            showProfileModal = false;
-        }
-    }
+// Toggle dropdown for user menu
+function toggleDropdown() {
+		isDropdownOpen = !isDropdownOpen;
+}
 
-	onMount(() => {
+// Logout function
+function handleLogout() {
+		localStorage.clear();
+		window.location.href = '/login';
+}
+
+// Function to fetch user and top-up data
+onMount(() => {
 		const usernameFromStorage = localStorage.getItem('username');
 		const userIDFromStorage = localStorage.getItem('userID');
 		const roleFromStorage = localStorage.getItem('role') || '';
-		document.addEventListener('click', closeProfileModal);
 
 		if (usernameFromStorage) {
-			username = usernameFromStorage;
-			role = roleFromStorage; // เก็บ role
+				username = usernameFromStorage;
+				role = roleFromStorage;
 
-			// Fetch user data and balance after login
-			async function fetchUserData() {
-				try {
-					// Fetch user data
-					const userResponse = await fetch(`http://localhost:3000/users/${userIDFromStorage}`);
-					const userData = await userResponse.json();
-					console.log(userData);
+				async function fetchUserData() {
+						try {
+								const userResponse = await fetch(`http://localhost:3000/users/${userIDFromStorage}`);
+								const userData = await userResponse.json();
 
-					if (userData && userData.balance !== undefined) {
-						balance = userData.balance;
-						localStorage.setItem('balance', balance.toString());
-					} else {
-						console.error('Balance is undefined in userData');
-					}
+								if (userData && userData.balance !== undefined) {
+										balance = userData.balance;
+										localStorage.setItem('balance', balance.toString());
+								}
 
-					// Fetch history data
-					const historyResponse = await fetch(
-						`http://localhost:3000/history/topup/${userIDFromStorage}`
-					);
-					topupHistory = await historyResponse.json();
-					console.log('Fetched historyData:', topupHistory);
-				} catch (error) {
-					console.error('Error fetching user or history data:', error);
+								const historyResponse = await fetch(
+										`http://localhost:3000/history/topup/${userIDFromStorage}`
+								);
+								topupHistory = await historyResponse.json();
+						} catch (error) {
+								console.error('Error fetching user or history data:', error);
+						}
 				}
-			}
 
-			fetchUserData();
+				fetchUserData();
 		}
-	});
+});
 
-	onDestroy(() => {
-        // ลบ event listener เมื่อ destroy component
-        document.removeEventListener('click', closeProfileModal);
-    });
+// Pagination functions for top-up history
+function paginatedTopupHistory(data, page) {
+		const start = (page - 1) * itemsPerPageTopup;
+		return data.slice(start, start + itemsPerPageTopup);
+}
+
+function nextPageTopup() {
+		const maxPage = Math.ceil(topupHistory.length / itemsPerPageTopup);
+		currentPageTopup = Math.min(currentPageTopup + 1, maxPage);
+}
+
+function prevPageTopup() {
+		currentPageTopup = Math.max(1, currentPageTopup - 1);
+}
 </script>
+
+<style>
+	/* กำหนด CSS ให้ dropdown เป็นแนวตั้ง */
+	.dropdown-menu {
+			position: absolute;
+			top: 60px;
+			right: 0;
+			width: 200px;
+			background-color: white;
+			border-radius: 8px;
+			box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+			z-index: 10;
+	}
+
+	.dropdown-item {
+			padding: 10px;
+			font-size: 18px;
+			color: #4A4A4A;
+			text-align: left;
+	}
+
+	.dropdown-item:hover {
+			background-color: #f0f0f0;
+	}
+</style>
 
 <div class="mx-auto w-full text-white text-center h-full">
 	<div class="relative isolate bg-gradient-to-t from-[#B5BAE4] to-[#FFFFFF] h-full">
@@ -114,28 +146,20 @@
                     </a>
                 </button>
 
-				<!-- ปุ่มเพื่อเปิด/ปิด navbar -->
-        <button id="profile-button" on:click={toggleProfileModal} class="flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="h-[30px] w-[30px] md:h-[40px] md:w-[40px] lg:h-[50px] lg:w-[50px]">
-              <path fill="#ffe3de" fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0a4.5 4.5 0 0 1-9 0M3.751 20.105a8.25 8.25 0 0 1 16.498 0a.75.75 0 0 1-.437.695A18.7 18.7 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695" clip-rule="evenodd"/>
-          </svg>
-          <span class="font-mitr font-regular text-sm md:text-lg lg:text-xl text-[#2C2C2C] ml-2">{username}</span>
-        </button>
+				<!-- Display Username และ Dropdown -->
+				<button on:click={toggleDropdown} class="relative flex items-center">
+					<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="h-[30px] w-[30px] md:h-[40px] md:w-[40px] lg:h-[50px] lg:w-[50px]">
+							<path fill="#ffe3de" fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0a4.5 4.5 0 0 1-9 0M3.751 20.105a8.25 8.25 0 0 1 16.498 0a.75.75 0 0 1-.437.695A18.7 18.7 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695" clip-rule="evenodd"/>
+					</svg>
+					<span class="font-mitr font-regular text-sm md:text-lg lg:text-xl text-[#2C2C2C] ml-2">{username}</span>
 
-        <!-- เมนู navbar ด้านขวา -->
-        {#if showProfileModal}
-          <div id="profile-navbar" class="fixed top-0 right-0 h-full w-64 bg-white bg-opacity-75 flex flex-col items-center p-6">
-              <div class="text-[#2C2C2C] font-mitr font-regular w-full">
-                  <h3 class="text-lg font-regular mb-4 bg-[#FFE3DE] rounded-lg p-4 drop-shadow-2xl">Profile Options</h3>
-                  <button class="w-full mb-2">
-                      <a href="/profile" class="font-mitr font-regular bg-[#6CAAF0] text-white px-4 py-1 rounded w-full text-center block">Edit profile</a>
-                  </button>
-                  <button class="w-full">
-                      <a href="/" class="font-mitr font-regular bg-[#6CAAF0] text-white px-4 py-1 rounded w-full text-center block">Log out</a>
-                  </button>
-              </div>
-          </div>
-        {/if}
+					{#if isDropdownOpen}
+							<div class="dropdown-menu">
+									<button on:click={() => window.location.href = '/profile'} class="font-mitr font-regular dropdown-item">Manage Password</button>
+									<button on:click={handleLogout} class="font-mitr font-regular dropdown-item">Logout</button>
+							</div>
+					{/if}
+			</button>
 
 				<!-- Display Balance -->
 				<button class="flex items-center">
@@ -188,24 +212,21 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each topupHistory as history}
-						<tr>
-							<td
-								class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3"
-								>{history.id}</td
-							>
-							<td
-								class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3"
-								>{history.transactionName}</td
-							>
-							<td
-								class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3"
-								>{history.amount}</td
-							>
-						</tr>
-					{/each}
+					{#each paginatedTopupHistory(topupHistory, currentPageTopup) as history}
+                    <tr>
+                        <td class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3">{history.id}</td>
+                        <td class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3">{history.transactionName}</td>
+                        <td class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3">{history.amount}</td>
+                    </tr>
+                {/each}
 				</tbody>
 			</table>
+
+			<!-- Pagination Controls -->
+			<div class="flex space-x-2 text-black mt-4">
+				<button class="font-mitr font-regular bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" on:click={prevPageTopup} disabled={currentPageTopup === 1}>Previous</button>
+				<button class="font-mitr font-regular bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" on:click={nextPageTopup} disabled={currentPageTopup === Math.ceil(topupHistory.length / itemsPerPageTopup)}>Next</button>
+		</div>
 		</div>
 	</div>
 </div>

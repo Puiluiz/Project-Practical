@@ -287,8 +287,8 @@
                 </tbody>
             </table>
             <div class="flex space-x-2 text-black">
-                <button class="font-mitr font-regular text-[#2C2C2C]" on:click={() => prevPage(currentPage1, setPage1)} disabled={currentPage1 === 1}>Previous</button>
-                <button class="font-mitr font-regular text-[#2C2C2C]" on:click={() => nextPage(currentPage1, setPage1, products1Month.length)} disabled={currentPage1 === Math.ceil(products1Month.length / itemsPerPage)}>Next</button>
+                <button class="font-mitr font-regular mt-5 bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" on:click={() => prevPage(currentPage1, setPage1)} disabled={currentPage1 === 1}>Previous</button>
+                <button class="font-mitr font-regular mt-5 bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" on:click={() => nextPage(currentPage1, setPage1, products1Month.length)} disabled={currentPage1 === Math.ceil(products1Month.length / itemsPerPage)}>Next</button>
             </div>
 
             {#if showEditForm}
@@ -336,8 +336,8 @@
                 </tbody>
             </table>
             <div class="flex space-x-2 text-black">
-                <button class="font-mitr font-regular text-[#2C2C2C]" on:click={() => prevPage(currentPage1, setPage1)} disabled={currentPage1 === 1}>Previous</button>
-                <button class="font-mitr font-regular text-[#2C2C2C]" on:click={() => nextPage(currentPage1, setPage1, products1Month.length)} disabled={currentPage1 === Math.ceil(products1Month.length / itemsPerPage)}>Next</button>
+                <button class="font-mitr font-regular mt-5 bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" on:click={() => prevPage(currentPage1, setPage1)} disabled={currentPage1 === 1}>Previous</button>
+                <button class="font-mitr font-regular mt-5 bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" on:click={() => nextPage(currentPage1, setPage1, products1Month.length)} disabled={currentPage1 === Math.ceil(products1Month.length / itemsPerPage)}>Next</button>
             </div>
         </div>
     </div>

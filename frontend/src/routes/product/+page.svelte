@@ -4,27 +4,18 @@
 	let username = '';
 	let balance = 0; // User's balance
 	let role = ''; // User's role
-	let showProfileModal = false;
+	let isDropdownOpen = false;
 
-    function toggleProfileModal() {
-        showProfileModal = !showProfileModal;
-    }
+// Toggle dropdown for user menu
+function toggleDropdown() {
+		isDropdownOpen = !isDropdownOpen;
+}
 
-		function closeProfileModal(event) {
-        // ตรวจสอบว่า target ของคลิกไม่ได้อยู่ใน navbar
-        if (!event.target.closest('#profile-navbar') && !event.target.closest('#profile-button')) {
-            showProfileModal = false;
-        }
-    }
-
-		onMount(() => {
-		document.addEventListener('click', closeProfileModal);
-		});
-
-		onDestroy(() => {
-        // ลบ event listener เมื่อ destroy component
-        document.removeEventListener('click', closeProfileModal);
-    });
+// Logout function
+function handleLogout() {
+		localStorage.clear();
+		window.location.href = '/login';
+}
 
 	// Check if localStorage is available and get the username, balance, and role after login
 	if (typeof window !== 'undefined') {
@@ -52,6 +43,31 @@
 	// Fetch products when the page loads
 	fetchProducts();
 </script>
+
+<style>
+  /* กำหนด CSS ให้ dropdown เป็นแนวตั้ง */
+  .dropdown-menu {
+      position: absolute;
+      top: 60px;
+      right: 0;
+      width: 200px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+  }
+
+  .dropdown-item {
+      padding: 10px;
+      font-size: 18px;
+      color: #4A4A4A;
+      text-align: left;
+  }
+
+  .dropdown-item:hover {
+      background-color: #f0f0f0;
+  }
+</style>
 
 <div class="mx-auto w-full text-white text-center h-full">
 	<!-- bg -->
@@ -119,28 +135,20 @@
 					</a>
 				</button>
 
-				<!-- ปุ่มเพื่อเปิด/ปิด navbar -->
-				<button id="profile-button" on:click={toggleProfileModal} class="flex items-center">
+				<!-- Display Username และ Dropdown -->
+				<button on:click={toggleDropdown} class="relative flex items-center">
 					<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="h-[30px] w-[30px] md:h-[40px] md:w-[40px] lg:h-[50px] lg:w-[50px]">
 							<path fill="#ffe3de" fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0a4.5 4.5 0 0 1-9 0M3.751 20.105a8.25 8.25 0 0 1 16.498 0a.75.75 0 0 1-.437.695A18.7 18.7 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695" clip-rule="evenodd"/>
 					</svg>
 					<span class="font-mitr font-regular text-sm md:text-lg lg:text-xl text-[#2C2C2C] ml-2">{username}</span>
-				</button>
 
-				<!-- เมนู navbar ด้านขวา -->
-				{#if showProfileModal}
-					<div id="profile-navbar" class="fixed top-0 right-0 h-full w-64 bg-white bg-opacity-75 flex flex-col items-center p-6">
-							<div class="text-[#2C2C2C] font-mitr font-regular w-full">
-									<h3 class="text-lg font-regular mb-4 bg-[#FFE3DE] rounded-lg p-4 drop-shadow-2xl">Profile Options</h3>
-									<button class="w-full mb-2">
-											<a href="/profile" class="font-mitr font-regular bg-[#6CAAF0] text-white px-4 py-1 rounded w-full text-center block">Edit profile</a>
-									</button>
-									<button class="w-full">
-											<a href="/" class="font-mitr font-regular bg-[#6CAAF0] text-white px-4 py-1 rounded w-full text-center block">Log out</a>
-									</button>
+					{#if isDropdownOpen}
+							<div class="dropdown-menu">
+									<button on:click={() => window.location.href = '/profile'} class="font-mitr font-regular dropdown-item">Manage Password</button>
+									<button on:click={handleLogout} class="font-mitr font-regular dropdown-item">Logout</button>
 							</div>
-					</div>
-				{/if}
+					{/if}
+			</button>
 
 				<!-- Display Balance -->
 				<button class="flex items-center">

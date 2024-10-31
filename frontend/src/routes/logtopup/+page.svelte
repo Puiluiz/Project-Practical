@@ -212,8 +212,8 @@
 			</table>
 						<!-- Pagination Controls -->
 						<div class="flex space-x-2 text-black">
-							<button class="font-mitr font-regular text-[#2C2C2C]" on:click={prevPage} disabled={currentPage === 1}>Previous</button>
-							<button class="font-mitr font-regular text-[#2C2C2C]" on:click={nextPage} disabled={currentPage === totalPages}>Next</button>
+							<button class="font-mitr font-regular mt-5 bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" on:click={prevPage} disabled={currentPage === 1}>Previous</button>
+							<button class="font-mitr font-regular mt-5 bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" on:click={nextPage} disabled={currentPage === totalPages}>Next</button>
 						</div>
 		</div>
 	</div>
