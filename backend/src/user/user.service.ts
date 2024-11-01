@@ -7,6 +7,7 @@ import { PrismaService } from 'src/utills/prisma/prisma.service';
 import { ManybahtService } from '../manybaht/manybaht.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdatePasswordAdminDto } from './dto/update-password-admin.dto';
 import { User, UserRole } from '@prisma/client';
 
 @Injectable()
@@ -259,11 +260,34 @@ export class UserService {
     if (user.password !== oldPassword) {
       throw new BadRequestException('Old password is incorrect');
     }
-
     // Update user's password without hashing (store plain text)
     await this.prisma.user.update({
       where: { id: userId },
       data: { password: newPassword }, // Store the new password as plain text
+    });
+
+    // Return a message instead of User data
+    return { message: 'Password updated successfully' };
+  }
+
+  async updatePasswordAdmin(
+    userId: number,
+    UpdatePasswordAdminDto: UpdatePasswordAdminDto,
+  ): Promise<{ message: string }> {
+    // Fetch user from the database
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    const { password } = UpdatePasswordAdminDto;
+
+    console.log(password)
+    // Update user's password without hashing (store plain text)
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: password }, // Store the new password as plain text
     });
 
     // Return a message instead of User data

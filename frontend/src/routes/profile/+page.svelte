@@ -24,6 +24,7 @@ function handleLogout() {
 	onMount(() => {
 		const usernameFromStorage = localStorage.getItem('username');
 		const userIDFromStorage = localStorage.getItem('userID');
+		console.log(userIDFromStorage)
 		const roleFromStorage = localStorage.getItem('role') || ''; // ดึง role จาก localStorage
 
 		if (usernameFromStorage) {
@@ -75,6 +76,9 @@ function handleLogout() {
 			}
 
 			// Send a request to the backend API to update the user info
+			const userID = localStorage.getItem('userID');
+
+			
 			const response = await fetch(`http://localhost:3000/users/${userID}/update-password`, {
 				method: 'PUT',
 				headers: {
@@ -203,15 +207,6 @@ function handleLogout() {
 		<div class="flex flex-col items-center h-screen text-center py-[200px]">
 
 			<div class="flex flex-col w-1/2 space-y-4">
-				<label for="email" class="block font-mitr font-regular text-[#2C2C2C] text-left text-2xl mb-1"
-					>Email (optional)</label
-				>
-				<input
-					bind:value={email}
-					type="email"
-					placeholder="Email"
-					class="font-mitr font-regular w-full p-3 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#B5BAE4] text-[#2C2C2C]"
-				/>
 
 				<label for="oldPassword" class="block font-mitr font-regular text-[#2C2C2C] text-left text-2xl mb-1"
 					>Old Password (required for password change)</label

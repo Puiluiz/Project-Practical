@@ -5,6 +5,7 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdatePasswordAdminDto } from './dto/update-password-admin.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 
@@ -83,15 +84,14 @@ export class UserController {
   }
 
   // ดึงข้อมูลผู้ใช้ตาม ID
-// ดึงข้อมูลผู้ใช้ตาม ID
-@Get(':id')
-async findOne(@Param('id') id: string): Promise<User> {
-  const user = await this.userService.findOneUser(Number(id)); // ตรวจสอบว่ามีการแปลงค่า id เป็น number
-  if (!user) {
-    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<User> {
+    const user = await this.userService.findOneUser(Number(id)); // ตรวจสอบว่ามีการแปลงค่า id เป็น number
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return user;
   }
-  return user;
-}
 
 
   // อัปเดตข้อมูลผู้ใช้
@@ -124,8 +124,16 @@ async findOne(@Param('id') id: string): Promise<User> {
     @Param('id') id: string,        // รับค่า id จากพารามิเตอร์ใน URL
     @Body() updatePasswordDto: UpdatePasswordDto // รับค่า body สำหรับข้อมูลการอัพเดต password
   ) {
+    console.log(this.updatePassword)
     return this.userService.updatePassword(parseInt(id), updatePasswordDto); // ส่ง id และ updatePasswordDto ไปยัง service
   }
-  
 
+  @Put(':id/update-password-admin')
+  async updatePasswordAdmin(
+    @Param('id') id: string,        // รับค่า id จากพารามิเตอร์ใน URL
+    @Body() updatePasswordAdminDto: UpdatePasswordAdminDto // รับค่า body สำหรับข้อมูลการอัพเดต password
+  ) {
+    console.log(this.updatePasswordAdmin)
+    return this.userService.updatePasswordAdmin(parseInt(id), updatePasswordAdminDto); // ส่ง id และ updatePasswordDto ไปยัง service
+  }
 }

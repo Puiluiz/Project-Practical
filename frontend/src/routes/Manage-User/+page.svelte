@@ -50,7 +50,7 @@
 				updateData.password = formData.password; // Only include password if it's entered
 			}
 
-			const response = await fetch(`http://localhost:3000/users/${editingUser.id}`, {
+			const response = await fetch(`http://localhost:3000/users/${editingUser.id}/update-password-admin`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json'
