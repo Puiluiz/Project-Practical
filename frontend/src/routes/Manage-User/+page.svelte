@@ -38,8 +38,39 @@
 		selected = user.role;
 	}
 
-	// Update the user information
-	async function updateUser() {
+	// // Update the user information
+	// async function updateUser() {
+	// 	try {
+	// 		const updateData = {
+	// 			balance: Number(formData.balance), // Update balance
+	// 			role: selected
+	// 		};
+
+	// 		if (formData.password) {
+	// 			updateData.password = formData.password; // Only include password if it's entered
+	// 		}
+
+	// 		const response = await fetch(`http://localhost:3000/users/${editingUser.id}/update-password-admin`, {
+	// 			method: 'PUT',
+	// 			headers: {
+	// 				'Content-Type': 'application/json'
+	// 			},
+	// 			body: JSON.stringify(updateData)
+	// 		});
+
+	// 		if (!response.ok) {
+	// 			throw new Error(`Error updating user: ${response.statusText}`);
+	// 		}
+
+	// 		await fetchUsers();
+	// 		showManageModal = false;
+	// 	} catch (error) {
+	// 		console.error('Error updating user:', error);
+	// 	}
+	// }
+
+		// Update the user information
+		async function updateUser() {
 		try {
 			const updateData = {
 				balance: Number(formData.balance), // Update balance
@@ -50,7 +81,7 @@
 				updateData.password = formData.password; // Only include password if it's entered
 			}
 
-			const response = await fetch(`http://localhost:3000/users/${editingUser.id}/update-password-admin`, {
+			const response = await fetch(`http://localhost:3000/users/${editingUser.id}`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json'

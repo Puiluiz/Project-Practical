@@ -27,16 +27,18 @@
     });
 
     async function fetchProducts() {
-        try {
-            const response1 = await fetch('http://localhost:3000/products/1month');
-            products1Month = await response1.json();
+    try {
+        const response1 = await fetch('http://localhost:3000/products/1month');
+        products1Month = await response1.json();
+        products1Month.sort((a, b) => a.id - b.id); // จัดเรียงตาม ID
 
-            const response2 = await fetch('http://localhost:3000/products/12months');
-            products12Months = await response2.json();
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        }
+        const response2 = await fetch('http://localhost:3000/products/12months');
+        products12Months = await response2.json();
+        products12Months.sort((a, b) => a.id - b.id); // จัดเรียงตาม ID
+    } catch (error) {
+        console.error('Error fetching products:', error);
     }
+}
 
     async function addProduct(productType) {
         console.log(formData.expire);
@@ -71,16 +73,16 @@
         }
     }
 
-    function openEditForm(product) {
+    function openEditForm(product, name_product) {
         showEditForm = true;
-        formData = { ...product }; 
+        formData = { ...product, name_product }; 
         editingProduct = product; 
     }
 
     async function manageProduct() {
         const productId = editingProduct.id;
-        const productType = editingProduct.productType;
-
+        const productType = formData.name_product;
+        
         const apiUrl = productType === '1month'
             ? `http://localhost:3000/products/1month/${productId}`
             : `http://localhost:3000/products/12months/${productId}`;
@@ -89,6 +91,10 @@
             console.error('กรุณากรอกข้อมูลให้ครบ');
             return;
         }
+
+            // Convert price to a float before sending
+              formData.expire = new Date(formData.expire).toISOString();
+              formData.price = parseFloat(formData.price);
 
         try {
             const response = await fetch(apiUrl, {
@@ -279,7 +285,7 @@
                             <td class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3">{product.price}</td>
 							<td class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3">{formatDate(product.expire)} ({remainingDays(product.expire)} days left)</td>
                             <td class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3">
-                                <button class="btn btn-secondary font-mitr font-regular bg-[#6CAAF0] text-white px-4 py-1 rounded mr-2" on:click={() => openEditForm(product)}>Edit</button>
+                                <button class="btn btn-secondary font-mitr font-regular bg-[#6CAAF0] text-white px-4 py-1 rounded mr-2" on:click={() => openEditForm(product, '1month')}>Edit</button>
                                 <button class="btn btn-danger font-mitr font-regular bg-[#BD4C52] text-white px-4 py-1 rounded" on:click={() => deleteProduct(product.id, '1month')}>Delete</button>
                             </td>
                         </tr>
@@ -328,7 +334,7 @@
                             <td class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3">{product.price}</td>
                             <td class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3">{formatDate(product.expire)} ({remainingDays(product.expire)} days left)</td>
                             <td class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3">
-                                <button class="btn btn-secondary font-mitr font-regular bg-[#6CAAF0] text-white px-4 py-1 rounded mr-2" on:click={() => openEditForm(product)}>Edit</button>
+                                <button class="btn btn-secondary font-mitr font-regular bg-[#6CAAF0] text-white px-4 py-1 rounded mr-2" on:click={() => openEditForm(product, '12months')}>Edit</button>
                                 <button class="btn btn-danger font-mitr font-regular bg-[#BD4C52] text-white px-4 py-1 rounded" on:click={() => deleteProduct(product.id, '12months')}>Delete</button>
                             </td>
                         </tr>

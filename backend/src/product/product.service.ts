@@ -36,7 +36,7 @@ export class ProductService {
         email: data.email,
         password: data.password,
         price: data.price,
-        expire: data.expire,
+        expire: data.expire ? new Date(data.expire) : undefined,
         quantity: 1,
         updatedAt: new Date(),
       },
@@ -101,9 +101,17 @@ export class ProductService {
   async updateProduct12Months(id: number, data: Partial<CreateProduct12MonthsDto>): Promise<Product12months> {
     return this.prisma.product12months.update({
       where: { id },
-      data,
+      data: {
+        email: data.email,
+        password: data.password,
+        price: data.price,
+        expire: data.expire ? new Date(data.expire) : undefined, // Convert expire to Date if needed
+        quantity: 1,
+        updatedAt: new Date(),
+      },
     });
   }
+  
 
   async removeProduct12Months(id: number): Promise<Product12months> {
     return this.prisma.product12months.delete({ where: { id } });

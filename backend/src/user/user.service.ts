@@ -183,56 +183,38 @@ export class UserService {
     return this.prisma.user.delete({ where: { id: userId } });
   }
 
-  // Update user information
-  async updateUser(
-    userId: number,
-    updateUserDto: UpdateUserDto,
-  ): Promise<User | null> {
-    // Fetch the user from the database
-    const existingUser = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
+  // // Update user information
+  // async updateUser(
+  //   userId: number,
+  //   updateUserDto: UpdateUserDto,
+  // ): Promise<User | null> {
+  //   // Fetch the user from the database
+  //   const existingUser = await this.prisma.user.findUnique({
+  //     where: { id: userId },
+  //   });
 
-    if (!existingUser) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
-    }
-
-    // Update the user with provided data
-    const updatedUser = await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        // Update only fields that are provided in updateUserDto
-        email: updateUserDto.email || existingUser.email, // Keep the current email if not provided
-        balance:
-          updateUserDto.balance !== undefined // Check if balance is provided
-            ? typeof updateUserDto.balance === 'string'
-              ? parseFloat(updateUserDto.balance) // Parse string to number if balance is a string
-              : updateUserDto.balance // Use balance as number if already a number
-            : existingUser.balance, // Keep the current balance if not provided
-        role: updateUserDto.role || existingUser.role, // Keep the current role if not provided
-      },
-    });
-
-    return updatedUser;
-  }
-
-  // อัปเดตข้อมูลผู้ใช้
-  // async updateUser(userId: number, updateUserDto: UpdateUserDto): Promise<User | null> {
+  //   if (!existingUser) {
+  //     throw new NotFoundException(`User with ID ${userId} not found`);
+  //   }
+  //   // Update the user with provided data
   //   const updatedUser = await this.prisma.user.update({
   //     where: { id: userId },
   //     data: {
-  //       ...updateUserDto,
+  //       // Update only fields that are provided in updateUserDto
+  //       email: updateUserDto.email || existingUser.email, // Keep the current email if not provided
   //       balance:
-  //         typeof updateUserDto.balance === 'string'
-  //           ? parseFloat(updateUserDto.balance)
-  //           : updateUserDto.balance,
-  //       role: updateUserDto.role as UserRole,
+  //         updateUserDto.balance !== undefined // Check if balance is provided
+  //           ? typeof updateUserDto.balance === 'string'
+  //             ? parseFloat(updateUserDto.balance) // Parse string to number if balance is a string
+  //             : updateUserDto.balance // Use balance as number if already a number
+  //           : existingUser.balance, // Keep the current balance if not provided
+  //       role: updateUserDto.role || existingUser.role, // Keep the current role if not provided
   //     },
   //   });
+
   //   return updatedUser;
   // }
 
-  // ดึงข้อมูลผู้ใช้พร้อมประวัติ
   async getUserWithHistory(userId: number) {
     return await this.prisma.user.findUnique({
       where: { id: userId },
@@ -270,18 +252,68 @@ export class UserService {
     return { message: 'Password updated successfully' };
   }
 
-  async updatePasswordAdmin(
+  // async updatePasswordAdmin(
+  //   userId: number,
+  //   UpdatePasswordAdminDto: UpdatePasswordAdminDto,
+  // ): Promise<{ message: string }> {
+  //   // Fetch user from the database
+  //   const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+  //   if (!user) {
+  //     throw new NotFoundException(`User with ID ${userId} not found`);
+  //   }
+
+  //   const { password } = UpdatePasswordAdminDto;
+
+  //   console.log(password)
+  //   // Update user's password without hashing (store plain text)
+  //   await this.prisma.user.update({
+  //     where: { id: userId },
+  //     data: { password: password }, // Store the new password as plain text
+  //   });
+
+  //   // Return a message instead of User data
+  //   return { message: 'Password updated successfully' };
+  // }
+
+  
+
+    async updateUser(
     userId: number,
-    UpdatePasswordAdminDto: UpdatePasswordAdminDto,
-  ): Promise<{ message: string }> {
-    // Fetch user from the database
+    updateUserDto: UpdateUserDto,
+  ): Promise<User | null> {
+    // Fetch the user from the database
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!existingUser) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    // Update the user with provided data
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        // Update only fields that are provided in updateUserDto
+        email: updateUserDto.email || existingUser.email, // Keep the current email if not provided
+        balance:
+          updateUserDto.balance !== undefined // Check if balance is provided
+            ? typeof updateUserDto.balance === 'string'
+              ? parseFloat(updateUserDto.balance) // Parse string to number if balance is a string
+              : updateUserDto.balance // Use balance as number if already a number
+            : existingUser.balance, // Keep the current balance if not provided
+        role: updateUserDto.role || existingUser.role, // Keep the current role if not provided
+      },
+    });
+
+        // Fetch user from the database
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    const { password } = UpdatePasswordAdminDto;
+    const { password } = updateUserDto;
 
     console.log(password)
     // Update user's password without hashing (store plain text)
@@ -291,6 +323,8 @@ export class UserService {
     });
 
     // Return a message instead of User data
-    return { message: 'Password updated successfully' };
+    // return { message: 'Password updated successfully' };
+
+    return updatedUser;
   }
 }

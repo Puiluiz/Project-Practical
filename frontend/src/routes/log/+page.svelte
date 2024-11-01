@@ -21,8 +21,10 @@
 
 	// Pagination variables
 	let currentPage = 1;
-	const itemsPerPage = 10;
-	let totalPages = 1;
+    const itemsPerPage = 10;
+    let totalPages = 1;
+    const itemsPerPageHistory = 10;
+    let currentPageHistory = 1;
 
 	onMount(() => {
 		const usernameFromStorage = localStorage.getItem('username');
@@ -97,20 +99,26 @@
 			alert('An error occurred while searching. Please try again later.');
 		}
 	}
-
+	
 	// Get paginated data for the current page
 	function paginatedData() {
-		const start = (currentPage - 1) * itemsPerPage;
-		return historyData.slice(start, start + itemsPerPage);
-	}
+			const start = (currentPage - 1) * itemsPerPage;
+			return historyData.slice(start, start + itemsPerPage);
+		}
 
-	function nextPage() {
-		if (currentPage < totalPages) currentPage++;
-	}
+		function paginatedHistoryData(data, page) {
+			const start = (page - 1) * itemsPerPageHistory;
+			return data.slice(start, start + itemsPerPageHistory);
+		}
 
-	function prevPage() {
-		if (currentPage > 1) currentPage--;
-	}
+		function nextPageHistory() {
+			const maxPage = Math.ceil(historyData.length / itemsPerPageHistory);
+			currentPageHistory = Math.min(currentPageHistory + 1, maxPage);
+		}
+
+		function prevPageHistory() {
+			currentPageHistory = Math.max(1, currentPageHistory - 1);
+		}
 </script>
 
 <div class="mx-auto w-full text-white text-center h-screen">
@@ -210,7 +218,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each historyData as history, index}
+					{#each paginatedHistoryData(historyData, currentPageHistory) as history, index}
 						<tr>
 							<td
 								class="font-mitr font-regular border border-slate-600 text-[#2C2C2C] bg-[#FFFFFF] p-3"
@@ -246,9 +254,14 @@
 			</table>
 			<!-- Pagination Controls -->
 			<div class="flex space-x-2 text-black">
-				<button class="font-mitr font-regular mt-5 bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" on:click={prevPage} disabled={currentPage === 1}>Previous</button>
-				<button class="font-mitr font-regular mt-5 bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" on:click={nextPage} disabled={currentPage === totalPages}>Next</button>
-			</div>
+                <button class="font-mitr font-regular mt-5 bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" 
+                        on:click={prevPageHistory} 
+                        disabled={currentPageHistory === 1}>Previous</button>
+
+                <button class="font-mitr font-regular mt-5 bg-[#FFFFFF] p-2 rounded-xl text-[#2C2C2C]" 
+                        on:click={nextPageHistory} 
+                        disabled={currentPageHistory === Math.ceil(historyData.length / itemsPerPageHistory)}>Next</button>
+        </div>
 		</div>
 	</div>
 </div>

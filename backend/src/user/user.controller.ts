@@ -128,12 +128,12 @@ export class UserController {
     return this.userService.updatePassword(parseInt(id), updatePasswordDto); // ส่ง id และ updatePasswordDto ไปยัง service
   }
 
-  @Put(':id/update-password-admin')
-  async updatePasswordAdmin(
-    @Param('id') id: string,        // รับค่า id จากพารามิเตอร์ใน URL
-    @Body() updatePasswordAdminDto: UpdatePasswordAdminDto // รับค่า body สำหรับข้อมูลการอัพเดต password
-  ) {
-    console.log(this.updatePasswordAdmin)
-    return this.userService.updatePasswordAdmin(parseInt(id), updatePasswordAdminDto); // ส่ง id และ updatePasswordDto ไปยัง service
-  }
+  // @Put(':id/update-password-admin')
+  // async updatePasswordAdmin(
+  //   @Param('id') id: string,        // รับค่า id จากพารามิเตอร์ใน URL
+  //   @Body() updatePasswordAdminDto: UpdatePasswordAdminDto // รับค่า body สำหรับข้อมูลการอัพเดต password
+  // ) {
+  //   console.log(this.updatePasswordAdmin)
+  //   return this.userService.updatePasswordAdmin(parseInt(id), updatePasswordAdminDto); // ส่ง id และ updatePasswordDto ไปยัง service
+  // }
 }
