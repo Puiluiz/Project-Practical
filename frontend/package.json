@@ -2,7 +2,7 @@
 	"name": "chinese-checker",
 	"version": "0.0.1",
 	"scripts": {
-		"dev": "vite dev --host && open https://pornhub.org",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
